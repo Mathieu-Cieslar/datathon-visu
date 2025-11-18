@@ -48,7 +48,7 @@ export default function Analytics() {
     investissement: d.Prix_Reno_Global,
     economieAnnuelle: d.Economie_Prix_Elec_An_Global + d.Economie_Prix_Gaz_An_Global,
     type: d.Type_logement,
-    dpe: d.Dpe_Final
+    dpe: d.Dpe_Final_Global
   }));
 
   // Répartition des gains gaz/élec

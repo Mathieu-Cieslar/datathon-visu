@@ -18,7 +18,11 @@ export interface RenovationData {
   Economie_Prix_Elec_An_Global: number;
   Nb_Annee_Amortissement: number;
   Dpe_Initial: string;
-  Dpe_Final: string;
+  Dpe_Final_Iso: string; // DPE après rénovation isolation uniquement
+  Dpe_Final_Chauffage: string; // DPE après rénovation chauffage uniquement
+  Dpe_Final_Global: string; // DPE après rénovation globale
+  Conso_Base_Gaz: number; // Consommation énergétique de base gaz (kWh/an)
+  Conso_Base_Elec: number; // Consommation énergétique de base électrique (kWh/an)
 }
 
 export interface UserInput {

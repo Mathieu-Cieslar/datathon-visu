@@ -4,7 +4,7 @@ import { loadData, calculateStats } from '~/utils/csvParser';
 import type { RenovationData, RecommendationResult } from '~/types/renovation';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
+  PieChart, Pie, Cell
 } from 'recharts';
 
 export async function loader() {
@@ -35,6 +35,7 @@ export default function Simulateur() {
   const [recommendations, setRecommendations] = useState<RecommendationResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [stats, setStats] = useState<any>(null);
+  const [baseConsumption, setBaseConsumption] = useState<{ gaz: number; elec: number } | null>(null);
 
   const typesLogement = [...new Set(data.map((d: RenovationData) => d.Type_logement))];
 
@@ -84,7 +85,11 @@ export default function Simulateur() {
       Economie_Gaz_Estime_Chauffage: number;
       Economie_Gaz_Estime_Global: number;
       Dpe_Initial: string;
-      Dpe_Final: string;
+      Dpe_Final_Iso: string;
+      Dpe_Final_Chauffage: string;
+      Dpe_Final_Global: string;
+      Conso_Base_Gaz: number;
+      Conso_Base_Elec: number;
     }
 
     const avgData = similarData.reduce(
@@ -104,8 +109,12 @@ export default function Simulateur() {
         Economie_Gaz_Estime_Iso: acc.Economie_Gaz_Estime_Iso + curr.Economie_Gaz_Estime_Iso / similarData.length,
         Economie_Gaz_Estime_Chauffage: acc.Economie_Gaz_Estime_Chauffage + curr.Economie_Gaz_Estime_Chauffage / similarData.length,
         Economie_Gaz_Estime_Global: acc.Economie_Gaz_Estime_Global + curr.Economie_Gaz_Estime_Global / similarData.length,
+        Conso_Base_Gaz: acc.Conso_Base_Gaz + curr.Conso_Base_Gaz / similarData.length,
+        Conso_Base_Elec: acc.Conso_Base_Elec + curr.Conso_Base_Elec / similarData.length,
         Dpe_Initial: curr.Dpe_Initial,
-        Dpe_Final: curr.Dpe_Final
+        Dpe_Final_Iso: curr.Dpe_Final_Iso,
+        Dpe_Final_Chauffage: curr.Dpe_Final_Chauffage,
+        Dpe_Final_Global: curr.Dpe_Final_Global
       }),
       {
         Prix_Reno_Iso: 0,
@@ -123,8 +132,12 @@ export default function Simulateur() {
         Economie_Gaz_Estime_Iso: 0,
         Economie_Gaz_Estime_Chauffage: 0,
         Economie_Gaz_Estime_Global: 0,
+        Conso_Base_Gaz: 0,
+        Conso_Base_Elec: 0,
         Dpe_Initial: similarData[0].Dpe_Initial,
-        Dpe_Final: similarData[0].Dpe_Final
+        Dpe_Final_Iso: similarData[0].Dpe_Final_Iso,
+        Dpe_Final_Chauffage: similarData[0].Dpe_Final_Chauffage,
+        Dpe_Final_Global: similarData[0].Dpe_Final_Global
       }
     );
 
@@ -135,7 +148,7 @@ export default function Simulateur() {
         economieAnnuelle: Math.round(avgData.Economie_Prix_Elec_An_Iso + avgData.Economie_Prix_Gaz_An_Iso),
         amortissement: Math.round(avgData.Prix_Reno_Iso / (avgData.Economie_Prix_Elec_An_Iso + avgData.Economie_Prix_Gaz_An_Iso)),
         dpeInitial: avgData.Dpe_Initial,
-        dpeFinal: avgData.Dpe_Final,
+        dpeFinal: avgData.Dpe_Final_Iso,
         economieElec: Math.round(avgData.Economie_Elec_Estime_Iso),
         economieGaz: Math.round(avgData.Economie_Gaz_Estime_Iso)
       },
@@ -145,7 +158,7 @@ export default function Simulateur() {
         economieAnnuelle: Math.round(avgData.Economie_Prix_Elec_An_Chauffage + avgData.Economie_Prix_Gaz_An_Chauffage),
         amortissement: Math.round(avgData.Prix_Reno_Chauffage / (avgData.Economie_Prix_Elec_An_Chauffage + avgData.Economie_Prix_Gaz_An_Chauffage)),
         dpeInitial: avgData.Dpe_Initial,
-        dpeFinal: avgData.Dpe_Final,
+        dpeFinal: avgData.Dpe_Final_Chauffage,
         economieElec: Math.round(avgData.Economie_Elec_Chauffage),
         economieGaz: Math.round(avgData.Economie_Gaz_Estime_Chauffage)
       },
@@ -155,11 +168,17 @@ export default function Simulateur() {
         economieAnnuelle: Math.round(avgData.Economie_Prix_Elec_An_Global + avgData.Economie_Prix_Gaz_An_Global),
         amortissement: Math.round(avgData.Prix_Reno_Global / (avgData.Economie_Prix_Elec_An_Global + avgData.Economie_Prix_Gaz_An_Global)),
         dpeInitial: avgData.Dpe_Initial,
-        dpeFinal: avgData.Dpe_Final,
+        dpeFinal: avgData.Dpe_Final_Global,
         economieElec: Math.round(avgData.Economie_Elec_Global),
         economieGaz: Math.round(avgData.Economie_Gaz_Estime_Global)
       }
     ];
+
+    // Stocker les consommations de base
+    setBaseConsumption({
+      gaz: Math.round(avgData.Conso_Base_Gaz),
+      elec: Math.round(avgData.Conso_Base_Elec)
+    });
 
     setRecommendations(results);
     setShowResults(true);
@@ -192,13 +211,6 @@ export default function Simulateur() {
       type: 'Gaz'
     }
   ]);
-
-  const radarData = recommendations.map(r => ({
-    scenario: r.scenario === 'iso' ? 'ISO' : r.scenario === 'chauffage' ? 'CHAUFF' : 'GLOBAL',
-    'Investissement': (r.investissement / 30000) * 100,
-    'Économies': (r.economieAnnuelle / 1000) * 100,
-    'ROI': 100 - (r.amortissement / 15) * 100
-  }));
 
   const bestOption = recommendations.length > 0 
     ? recommendations.reduce((best, curr) => 
@@ -295,6 +307,15 @@ export default function Simulateur() {
                     <span className="metric-label">Amortissement</span>
                     <span className="metric-value blue">{rec.amortissement} ans</span>
                   </div>
+                  <div className="dpe-evolution" style={{ margin: '1rem 0' }}>
+                    <span className="dpe-badge" style={{ backgroundColor: DPE_COLORS[rec.dpeInitial] }}>
+                      {rec.dpeInitial}
+                    </span>
+                    <span className="arrow">→</span>
+                    <span className="dpe-badge" style={{ backgroundColor: DPE_COLORS[rec.dpeFinal] }}>
+                      {rec.dpeFinal}
+                    </span>
+                  </div>
                   <div className="energy-breakdown">
                     <div className="energy-item">
                       <span>⚡ Élec: {rec.economieElec} kWh/an</span>
@@ -306,6 +327,22 @@ export default function Simulateur() {
                 </div>
               ))}
             </div>
+
+            {baseConsumption && (
+              <div className="info-banner" style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+                <h3 style={{ marginBottom: '1rem' }}>📊 Consommations énergétiques de base</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                  <div className="metric">
+                    <span className="metric-label">Gaz actuel</span>
+                    <span className="metric-value">{baseConsumption.gaz.toLocaleString('fr-FR')} kWh/an</span>
+                  </div>
+                  <div className="metric">
+                    <span className="metric-label">Électricité actuelle</span>
+                    <span className="metric-value">{baseConsumption.elec.toLocaleString('fr-FR')} kWh/an</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="charts-grid">
               <div className="chart-card">
@@ -367,22 +404,6 @@ export default function Simulateur() {
                     </Pie>
                     <Tooltip />
                   </PieChart>
-                </ResponsiveContainer>
-              </div>
-
-              <div className="chart-card">
-                <h3>🎯 Vue d'ensemble comparative</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RadarChart data={radarData}>
-                    <PolarGrid />
-                    <PolarAngleAxis dataKey="scenario" />
-                    <PolarRadiusAxis angle={90} domain={[0, 100]} />
-                    <Radar name="Performance" dataKey="Investissement" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
-                    <Radar name="Économies" dataKey="Économies" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.3} />
-                    <Radar name="ROI" dataKey="ROI" stroke="#ffc658" fill="#ffc658" fillOpacity={0.3} />
-                    <Tooltip />
-                    <Legend />
-                  </RadarChart>
                 </ResponsiveContainer>
               </div>
             </div>

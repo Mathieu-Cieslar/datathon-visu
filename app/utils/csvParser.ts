@@ -77,9 +77,9 @@ export const calculateStats = (data: RenovationData[]) => {
   const transitionMap: Record<string, number> = {};
   data.forEach(row => {
     stats.repartitionDPE.initial[row.Dpe_Initial] = (stats.repartitionDPE.initial[row.Dpe_Initial] || 0) + 1;
-    stats.repartitionDPE.final[row.Dpe_Final] = (stats.repartitionDPE.final[row.Dpe_Final] || 0) + 1;
+    stats.repartitionDPE.final[row.Dpe_Final_Global] = (stats.repartitionDPE.final[row.Dpe_Final_Global] || 0) + 1;
     
-    const transitionKey = `${row.Dpe_Initial}->${row.Dpe_Final}`;
+    const transitionKey = `${row.Dpe_Initial}->${row.Dpe_Final_Global}`;
     transitionMap[transitionKey] = (transitionMap[transitionKey] || 0) + 1;
   });
 

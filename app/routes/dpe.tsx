@@ -60,16 +60,16 @@ export default function DPEDashboard() {
       to: t.to
     }));
 
-  // Amélioration moyenne du DPE
+  // Amélioration moyenne du DPE (basé sur la rénovation globale)
   const dpeToNumber: Record<string, number> = { G: 1, F: 2, E: 3, D: 4, C: 5, B: 6, A: 7 };
   const avgImprovement = data.reduce((sum, d) => {
-    return sum + (dpeToNumber[d.Dpe_Final] - dpeToNumber[d.Dpe_Initial]);
+    return sum + (dpeToNumber[d.Dpe_Final_Global] - dpeToNumber[d.Dpe_Initial]);
   }, 0) / data.length;
 
   // Coût moyen par niveau d'amélioration DPE
   const improvementCostData: Record<number, { count: number; totalCost: number }> = {};
   data.forEach((d: RenovationData) => {
-    const improvement = dpeToNumber[d.Dpe_Final] - dpeToNumber[d.Dpe_Initial];
+    const improvement = dpeToNumber[d.Dpe_Final_Global] - dpeToNumber[d.Dpe_Initial];
     if (!improvementCostData[improvement]) {
       improvementCostData[improvement] = { count: 0, totalCost: 0 };
     }
@@ -85,14 +85,14 @@ export default function DPEDashboard() {
     }))
     .sort((a, b) => parseInt(a.amélioration.replace('+', '')) - parseInt(b.amélioration.replace('+', '')));
 
-  // Distribution des économies par DPE final
+  // Distribution des économies par DPE final (rénovation globale)
   const savingsByFinalDPE: Record<string, { count: number; totalSavings: number }> = {};
   data.forEach((d: RenovationData) => {
-    if (!savingsByFinalDPE[d.Dpe_Final]) {
-      savingsByFinalDPE[d.Dpe_Final] = { count: 0, totalSavings: 0 };
+    if (!savingsByFinalDPE[d.Dpe_Final_Global]) {
+      savingsByFinalDPE[d.Dpe_Final_Global] = { count: 0, totalSavings: 0 };
     }
-    savingsByFinalDPE[d.Dpe_Final].count++;
-    savingsByFinalDPE[d.Dpe_Final].totalSavings += d.Economie_Prix_Elec_An_Global + d.Economie_Prix_Gaz_An_Global;
+    savingsByFinalDPE[d.Dpe_Final_Global].count++;
+    savingsByFinalDPE[d.Dpe_Final_Global].totalSavings += d.Economie_Prix_Elec_An_Global + d.Economie_Prix_Gaz_An_Global;
   });
 
   const savingsByDPE = Object.entries(savingsByFinalDPE)
@@ -102,16 +102,16 @@ export default function DPEDashboard() {
       'Économie annuelle moyenne (€)': Math.round(stats.totalSavings / stats.count)
     }));
 
-  // Stats par type de logement et DPE
+  // Stats par type de logement et DPE (rénovation globale)
   const dpeByType: Record<string, Record<string, number>> = {};
   data.forEach((d: RenovationData) => {
     if (!dpeByType[d.Type_logement]) {
       dpeByType[d.Type_logement] = {};
     }
-    if (!dpeByType[d.Type_logement][d.Dpe_Final]) {
-      dpeByType[d.Type_logement][d.Dpe_Final] = 0;
+    if (!dpeByType[d.Type_logement][d.Dpe_Final_Global]) {
+      dpeByType[d.Type_logement][d.Dpe_Final_Global] = 0;
     }
-    dpeByType[d.Type_logement][d.Dpe_Final]++;
+    dpeByType[d.Type_logement][d.Dpe_Final_Global]++;
   });
 
   const dpeTypeData = Object.entries(dpeByType).map(([type, dpes]) => {
@@ -122,7 +122,7 @@ export default function DPEDashboard() {
     return result;
   });
 
-  const allDPEKeys = [...new Set(data.map(d => d.Dpe_Final))].sort((a, b) => DPE_ORDER.indexOf(a) - DPE_ORDER.indexOf(b));
+  const allDPEKeys = [...new Set(data.map(d => d.Dpe_Final_Global))].sort((a, b) => DPE_ORDER.indexOf(a) - DPE_ORDER.indexOf(b));
 
   return (
     <div className="dpe-container">
