@@ -1,5 +1,5 @@
 import { useLoaderData } from 'react-router';
-import { parseCSV, calculateStats } from '~/utils/csvParser';
+import { loadData, calculateStats } from '~/utils/csvParser';
 import type { RenovationData } from '~/types/renovation';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 
 export async function loader() {
-  const data = await parseCSV('/test2_csv.csv');
+  const data = await loadData('/data.json');
   const stats = calculateStats(data);
   return { data, stats };
 }

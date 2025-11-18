@@ -1,34 +1,31 @@
-import Papa from 'papaparse';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import type { RenovationData } from '~/types/renovation';
 
-export const parseCSV = async (csvPath: string): Promise<RenovationData[]> => {
+export const loadData = async (jsonPath: string): Promise<RenovationData[]> => {
   try {
-    // Lire le fichier depuis le système de fichiers (côté serveur)
-    const filePath = join(process.cwd(), 'public', csvPath.replace(/^\//, ''));
-    const csvText = readFileSync(filePath, 'utf-8');
+    // Déterminer si on est côté serveur ou client
+    const isServer = typeof window === 'undefined';
     
-    console.log('Contenu du CSV chargé:', csvText.slice(0, 200)); // Affiche les 200 premiers caractères du CSV
-    return new Promise((resolve, reject) => {
-      Papa.parse<RenovationData>(csvText, {
-        header: true,
-        delimiter: ';',
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          if (results.errors.length > 0) {
-            console.error('Erreurs de parsing:', results.errors);
-          }
-          resolve(results.data as RenovationData[]);
-        },
-        error: (error: Error) => {
-          reject(error);
-        }
-      });
-    });
+    if (isServer) {
+      // Côté serveur : lire directement le fichier
+      const fs = await import('fs');
+      const path = await import('path');
+      const filePath = path.join(process.cwd(), 'public', jsonPath.replace(/^\//, ''));
+      const jsonText = fs.readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(jsonText) as RenovationData[];
+      console.log('Données JSON chargées (serveur):', data.length, 'entrées');
+      return data;
+    } else {
+      // Côté client : utiliser fetch
+      const response = await fetch(jsonPath);
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      const data = await response.json() as RenovationData[];
+      console.log('Données JSON chargées (client):', data.length, 'entrées');
+      return data;
+    }
   } catch (error) {
-    console.error('Erreur lors du chargement du CSV:', error);
+    console.error('Erreur lors du chargement du JSON:', error);
     throw error;
   }
 };
