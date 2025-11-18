@@ -32,6 +32,7 @@ export default function Simulateur() {
   const { data } = useLoaderData<LoaderData>();
   const [typeLogement, setTypeLogement] = useState('');
   const [surface, setSurface] = useState('');
+  const [typeEnergie, setTypeEnergie] = useState<'gaz' | 'electricite'>('gaz');
   const [recommendations, setRecommendations] = useState<RecommendationResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [stats, setStats] = useState<any>(null);
@@ -141,12 +142,18 @@ export default function Simulateur() {
       }
     );
 
+    // Calculer les économies en fonction du type d'énergie
+    const getEconomieAnnuelle = (elec: number, gaz: number) => {
+      if (typeEnergie === 'electricite') return elec;
+      return gaz; // gaz uniquement
+    };
+
     const results: RecommendationResult[] = [
       {
         scenario: 'iso',
         investissement: Math.round(avgData.Prix_Reno_Iso),
-        economieAnnuelle: Math.round(avgData.Economie_Prix_Elec_An_Iso + avgData.Economie_Prix_Gaz_An_Iso),
-        amortissement: Math.round(avgData.Prix_Reno_Iso / (avgData.Economie_Prix_Elec_An_Iso + avgData.Economie_Prix_Gaz_An_Iso)),
+        economieAnnuelle: Math.round(getEconomieAnnuelle(avgData.Economie_Prix_Elec_An_Iso, avgData.Economie_Prix_Gaz_An_Iso)),
+        amortissement: Math.round(avgData.Prix_Reno_Iso / getEconomieAnnuelle(avgData.Economie_Prix_Elec_An_Iso, avgData.Economie_Prix_Gaz_An_Iso)),
         dpeInitial: avgData.Dpe_Initial,
         dpeFinal: avgData.Dpe_Final_Iso,
         economieElec: Math.round(avgData.Economie_Elec_Estime_Iso),
@@ -155,8 +162,8 @@ export default function Simulateur() {
       {
         scenario: 'chauffage',
         investissement: Math.round(avgData.Prix_Reno_Chauffage),
-        economieAnnuelle: Math.round(avgData.Economie_Prix_Elec_An_Chauffage + avgData.Economie_Prix_Gaz_An_Chauffage),
-        amortissement: Math.round(avgData.Prix_Reno_Chauffage / (avgData.Economie_Prix_Elec_An_Chauffage + avgData.Economie_Prix_Gaz_An_Chauffage)),
+        economieAnnuelle: Math.round(getEconomieAnnuelle(avgData.Economie_Prix_Elec_An_Chauffage, avgData.Economie_Prix_Gaz_An_Chauffage)),
+        amortissement: Math.round(avgData.Prix_Reno_Chauffage / getEconomieAnnuelle(avgData.Economie_Prix_Elec_An_Chauffage, avgData.Economie_Prix_Gaz_An_Chauffage)),
         dpeInitial: avgData.Dpe_Initial,
         dpeFinal: avgData.Dpe_Final_Chauffage,
         economieElec: Math.round(avgData.Economie_Elec_Chauffage),
@@ -165,8 +172,8 @@ export default function Simulateur() {
       {
         scenario: 'global',
         investissement: Math.round(avgData.Prix_Reno_Global),
-        economieAnnuelle: Math.round(avgData.Economie_Prix_Elec_An_Global + avgData.Economie_Prix_Gaz_An_Global),
-        amortissement: Math.round(avgData.Prix_Reno_Global / (avgData.Economie_Prix_Elec_An_Global + avgData.Economie_Prix_Gaz_An_Global)),
+        economieAnnuelle: Math.round(getEconomieAnnuelle(avgData.Economie_Prix_Elec_An_Global, avgData.Economie_Prix_Gaz_An_Global)),
+        amortissement: Math.round(avgData.Prix_Reno_Global / getEconomieAnnuelle(avgData.Economie_Prix_Elec_An_Global, avgData.Economie_Prix_Gaz_An_Global)),
         dpeInitial: avgData.Dpe_Initial,
         dpeFinal: avgData.Dpe_Final_Global,
         economieElec: Math.round(avgData.Economie_Elec_Global),
@@ -199,18 +206,24 @@ export default function Simulateur() {
     'Années amortissement': r.amortissement
   }));
 
-  const energyData = recommendations.flatMap(r => [
-    {
-      name: `${r.scenario === 'iso' ? 'ISO' : r.scenario === 'chauffage' ? 'Chauff' : 'Global'} - Élec`,
-      value: r.economieElec,
-      type: 'Électricité'
-    },
-    {
-      name: `${r.scenario === 'iso' ? 'ISO' : r.scenario === 'chauffage' ? 'Chauff' : 'Global'} - Gaz`,
-      value: r.economieGaz,
-      type: 'Gaz'
+  const energyData = recommendations.flatMap(r => {
+    const data = [];
+    if (typeEnergie === 'electricite') {
+      data.push({
+        name: `${r.scenario === 'iso' ? 'ISO' : r.scenario === 'chauffage' ? 'Chauff' : 'Global'} - Élec`,
+        value: r.economieElec,
+        type: 'Électricité'
+      });
     }
-  ]);
+    if (typeEnergie === 'gaz') {
+      data.push({
+        name: `${r.scenario === 'iso' ? 'ISO' : r.scenario === 'chauffage' ? 'Chauff' : 'Global'} - Gaz`,
+        value: r.economieGaz,
+        type: 'Gaz'
+      });
+    }
+    return data;
+  });
 
   const bestOption = recommendations.length > 0 
     ? recommendations.reduce((best, curr) => 
@@ -251,6 +264,18 @@ export default function Simulateur() {
               placeholder="Ex: 100"
               className="form-input"
             />
+          </div>
+
+          <div className="form-group">
+            <label>Type d'énergie actuel</label>
+            <select 
+              value={typeEnergie} 
+              onChange={(e) => setTypeEnergie(e.target.value as 'gaz' | 'electricite')}
+              className="form-input"
+            >
+              <option value="gaz">Gaz uniquement</option>
+              <option value="electricite">Électricité uniquement</option>
+            </select>
           </div>
 
           <button 
@@ -317,12 +342,16 @@ export default function Simulateur() {
                     </span>
                   </div>
                   <div className="energy-breakdown">
-                    <div className="energy-item">
-                      <span>⚡ Élec: {rec.economieElec} kWh/an</span>
-                    </div>
-                    <div className="energy-item">
-                      <span>🔥 Gaz: {rec.economieGaz} kWh/an</span>
-                    </div>
+                    {typeEnergie === 'electricite' && (
+                      <div className="energy-item">
+                        <span>⚡ Élec: {rec.economieElec} kWh/an</span>
+                      </div>
+                    )}
+                    {typeEnergie === 'gaz' && (
+                      <div className="energy-item">
+                        <span>🔥 Gaz: {rec.economieGaz} kWh/an</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -332,14 +361,18 @@ export default function Simulateur() {
               <div className="info-banner" style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
                 <h3 style={{ marginBottom: '1rem' }}>📊 Consommations énergétiques de base</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-                  <div className="metric">
-                    <span className="metric-label">Gaz actuel</span>
-                    <span className="metric-value">{baseConsumption.gaz.toLocaleString('fr-FR')} kWh/an</span>
-                  </div>
-                  <div className="metric">
-                    <span className="metric-label">Électricité actuelle</span>
-                    <span className="metric-value">{baseConsumption.elec.toLocaleString('fr-FR')} kWh/an</span>
-                  </div>
+                  {typeEnergie === 'gaz' && (
+                    <div className="metric">
+                      <span className="metric-label">Gaz actuel</span>
+                      <span className="metric-value">{baseConsumption.gaz.toLocaleString('fr-FR')} kWh/an</span>
+                    </div>
+                  )}
+                  {typeEnergie === 'electricite' && (
+                    <div className="metric">
+                      <span className="metric-label">Électricité actuelle</span>
+                      <span className="metric-value">{baseConsumption.elec.toLocaleString('fr-FR')} kWh/an</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
