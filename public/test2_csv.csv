@@ -1,0 +1,6 @@
+Type_logement;Surface;Prix_Reno_Chauffage;Prix_Reno_Iso;Prix_Reno_Global;Economie_Elec_Estime_Iso;Economie_Elec_Chauffage;Economie_Elec_Global;Economie_Gaz_Estime_Iso;Economie_Gaz_Estime_Chauffage;Economie_Gaz_Estime_Global;Economie_Prix_Gaz_An_Iso;Economie_Prix_Gaz_An_Chauffage;Economie_Prix_Gaz_An_Global;Economie_Prix_Elec_An_Iso;Economie_Prix_Elec_An_Chauffage;Economie_Prix_Elec_An_Global;Nb_Annee_Amortissement;Dpe_Initial;Dpe_Final
+Appartement;55;8000;6000;13000;450;120;550;120;350;420;180;520;600;110;160;230;12;E;D
+Maison Individuelle;120;15000;12000;26000;650;200;800;350;600;900;250;430;680;180;260;420;10;F;C
+Appartement;70;9000;7000;15000;500;150;650;150;480;600;210;690;850;130;210;300;11;D;C
+Maison Mitoyenne;95;13000;10000;23000;600;180;750;280;550;780;240;470;710;160;240;380;9;E;C
+Maison Individuelle;160;18000;15000;31000;800;250;1050;420;700;1120;300;520;820;210;310;500;8;F;C
