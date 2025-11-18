@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  Link,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -42,7 +43,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <>
+      <nav className="nav-container">
+        <div className="nav-content">
+          <Link to="/" className="nav-logo">
+            🏡 RénoVisu
+          </Link>
+          <ul className="nav-links">
+            <li><Link to="/">Accueil</Link></li>
+            <li><Link to="/simulateur">Simulateur</Link></li>
+            <li><Link to="/analytics">Analytics</Link></li>
+            <li><Link to="/dpe">DPE</Link></li>
+          </ul>
+        </div>
+      </nav>
+      <Outlet />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
