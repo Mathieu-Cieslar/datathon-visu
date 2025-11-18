@@ -20,7 +20,7 @@
     "Nb_Annee_Amortissement": 12,
     "Dpe_Initial": "E",
     "Dpe_Final_Iso": "D",
-    "Dpe_Final_Chauffage": "E",
+    "Dpe_Final_Chauffage": "D",
     "Dpe_Final_Global": "C",
     "Conso_Base_Gaz": 8500,
     "Conso_Base_Elec": 3200
@@ -72,7 +72,7 @@
     "Nb_Annee_Amortissement": 11,
     "Dpe_Initial": "D",
     "Dpe_Final_Iso": "C",
-    "Dpe_Final_Chauffage": "D",
+    "Dpe_Final_Chauffage": "C",
     "Dpe_Final_Global": "B",
     "Conso_Base_Gaz": 10500,
     "Conso_Base_Elec": 4000
