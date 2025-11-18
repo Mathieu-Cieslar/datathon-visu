@@ -72,7 +72,10 @@ export default function Analytics() {
       avgSurfaceByType[d.Type_logement] = { count: 0, totalSurface: 0 };
     }
     avgSurfaceByType[d.Type_logement].count++;
-    avgSurfaceByType[d.Type_logement].totalSurface += d.Surface;
+    // Calculer la surface moyenne de la plage "min-max"
+    const [min, max] = d.Surface.split('-').map(Number);
+    const avgSurface = (min + max) / 2;
+    avgSurfaceByType[d.Type_logement].totalSurface += avgSurface;
   });
 
   const surfaceStats = Object.entries(avgSurfaceByType).map(([type, stats]) => ({

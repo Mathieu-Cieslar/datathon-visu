@@ -33,7 +33,7 @@ export const loadData = async (jsonPath: string): Promise<RenovationData[]> => {
 export const calculateStats = (data: RenovationData[]) => {
   const stats = {
     prixMoyenParType: {} as Record<string, { iso: number; chauffage: number; global: number }>,
-    economiesMoyennesParSurface: [] as Array<{ surface: number; economies: number }>,
+    economiesMoyennesParSurface: [] as Array<{ surface: string; economies: number }>,
     repartitionDPE: {
       initial: {} as Record<string, number>,
       final: {} as Record<string, number>,
@@ -64,11 +64,11 @@ export const calculateStats = (data: RenovationData[]) => {
     };
   });
 
-  // Économies moyennes par surface
+  // Économies moyennes par surface (garder la plage de surface)
   data.forEach(row => {
     const economieAnnuelle = row.Economie_Prix_Elec_An_Global + row.Economie_Prix_Gaz_An_Global;
     stats.economiesMoyennesParSurface.push({
-      surface: row.Surface,
+      surface: row.Surface, // Maintenant c'est une chaîne de caractères comme "40-60"
       economies: economieAnnuelle
     });
   });

@@ -1,7 +1,7 @@
 [
   {
     "Type_logement": "Appartement",
-    "Surface": 55,
+    "Surface": "40-60",
     "Prix_Reno_Chauffage": 8000,
     "Prix_Reno_Iso": 6000,
     "Prix_Reno_Global": 13000,
@@ -23,7 +23,7 @@
   },
   {
     "Type_logement": "Maison Individuelle",
-    "Surface": 120,
+    "Surface": "100-140",
     "Prix_Reno_Chauffage": 15000,
     "Prix_Reno_Iso": 12000,
     "Prix_Reno_Global": 26000,
@@ -45,7 +45,7 @@
   },
   {
     "Type_logement": "Appartement",
-    "Surface": 70,
+    "Surface": "60-80",
     "Prix_Reno_Chauffage": 9000,
     "Prix_Reno_Iso": 7000,
     "Prix_Reno_Global": 15000,
@@ -67,7 +67,7 @@
   },
   {
     "Type_logement": "Maison Mitoyenne",
-    "Surface": 95,
+    "Surface": "80-110",
     "Prix_Reno_Chauffage": 13000,
     "Prix_Reno_Iso": 10000,
     "Prix_Reno_Global": 23000,
@@ -89,7 +89,7 @@
   },
   {
     "Type_logement": "Maison Individuelle",
-    "Surface": 160,
+    "Surface": "140-180",
     "Prix_Reno_Chauffage": 18000,
     "Prix_Reno_Iso": 15000,
     "Prix_Reno_Global": 31000,

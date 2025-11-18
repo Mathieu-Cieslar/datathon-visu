@@ -1,6 +1,6 @@
 export interface RenovationData {
   Type_logement: string;
-  Surface: number;
+  Surface: string; // Format: "min-max" (ex: "40-60")
   Prix_Reno_Chauffage: number;
   Prix_Reno_Iso: number;
   Prix_Reno_Global: number;

@@ -46,11 +46,19 @@ export default function Simulateur() {
   const handleSimulate = () => {
     if (!typeLogement || !surface) return;
 
+    const userSurface = parseInt(surface);
+
+    // Fonction pour vérifier si la surface utilisateur est dans la plage
+    const isInRange = (surfaceRange: string, userSurface: number): boolean => {
+      const [min, max] = surfaceRange.split('-').map(Number);
+      return userSurface >= min && userSurface <= max;
+    };
+
     // Trouver des données similaires
     const similarData = data.filter(
       (d: RenovationData) =>
         d.Type_logement === typeLogement &&
-        Math.abs(d.Surface - parseInt(surface)) < 30
+        isInRange(d.Surface, userSurface)
     );
 
     if (similarData.length === 0) {
