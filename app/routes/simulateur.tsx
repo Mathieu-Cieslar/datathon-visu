@@ -4,7 +4,7 @@ import { loadData, calculateStats } from '~/utils/csvParser';
 import type { RenovationData, RecommendationResult } from '~/types/renovation';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell
+  PieChart, Pie, Cell, LineChart, Line, Area, AreaChart, RadialBarChart, RadialBar
 } from 'recharts';
 
 export async function loader() {
@@ -225,6 +225,39 @@ export default function Simulateur() {
     return data;
   });
 
+  // Données pour graphique des économies cumulées sur 20 ans
+  const cumulativeData = Array.from({ length: 21 }, (_, year) => ({
+    année: year,
+    ...recommendations.reduce((acc, r) => ({
+      ...acc,
+      [r.scenario === 'iso' ? 'Isolation' : r.scenario === 'chauffage' ? 'Chauffage' : 'Globale']: 
+        r.economieAnnuelle * year - (year === 0 ? 0 : r.investissement)
+    }), {})
+  }));
+
+  // Données pour graphique comparatif Investissement vs Économies totales sur 10 ans
+  const investVsReturnData = recommendations.map(r => ({
+    name: r.scenario === 'iso' ? 'Isolation' : r.scenario === 'chauffage' ? 'Chauffage' : 'Globale',
+    'Investissement': r.investissement,
+    'Économies 10 ans': r.economieAnnuelle * 10,
+    'Économies 20 ans': r.economieAnnuelle * 20
+  }));
+
+  // Données pour graphique % de réduction énergétique
+  const reductionData = recommendations.map(r => {
+    const consoBase = typeEnergie === 'electricite' 
+      ? (baseConsumption?.elec || 5000) 
+      : (baseConsumption?.gaz || 12000);
+    const economieEnergie = typeEnergie === 'electricite' ? r.economieElec : r.economieGaz;
+    const tauxReduction = ((economieEnergie / consoBase) * 100);
+    
+    return {
+      name: r.scenario === 'iso' ? 'Isolation' : r.scenario === 'chauffage' ? 'Chauffage' : 'Globale',
+      'Réduction (%)': Math.round(tauxReduction),
+      fill: r.scenario === 'iso' ? '#8884d8' : r.scenario === 'chauffage' ? '#82ca9d' : '#ffc658'
+    };
+  });
+
   const bestOption = recommendations.length > 0 
     ? recommendations.reduce((best, curr) => 
         curr.amortissement < best.amortissement ? curr : best
@@ -437,6 +470,55 @@ export default function Simulateur() {
                     </Pie>
                     <Tooltip />
                   </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="chart-card">
+                <h3>📈 Évolution des économies cumulées (20 ans)</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={cumulativeData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="année" label={{ value: 'Années', position: 'insideBottom', offset: -5 }} />
+                    <YAxis label={{ value: 'Économies (€)', angle: -90, position: 'insideLeft' }} />
+                    <Tooltip formatter={(value) => `${Number(value).toLocaleString('fr-FR')} €`} />
+                    <Legend />
+                    <Area type="monotone" dataKey="Isolation" stackId="1" stroke="#8884d8" fill="#8884d8" />
+                    <Area type="monotone" dataKey="Chauffage" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
+                    <Area type="monotone" dataKey="Globale" stackId="1" stroke="#ffc658" fill="#ffc658" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="chart-card">
+                <h3>💰 Investissement vs Retour sur 10 et 20 ans</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={investVsReturnData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => `${Number(value).toLocaleString('fr-FR')} €`} />
+                    <Legend />
+                    <Bar dataKey="Investissement" fill="#ff6b6b" />
+                    <Bar dataKey="Économies 10 ans" fill="#4ecdc4" />
+                    <Bar dataKey="Économies 20 ans" fill="#45b7d1" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="chart-card">
+                <h3>📊 Réduction de consommation énergétique (%)</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={reductionData} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" unit="%" />
+                    <YAxis dataKey="name" type="category" />
+                    <Tooltip formatter={(value) => `${value}%`} />
+                    <Bar dataKey="Réduction (%)" fill="#82ca9d">
+                      {reductionData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
