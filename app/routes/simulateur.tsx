@@ -8,7 +8,7 @@ import {
 } from 'recharts';
 
 export async function loader() {
-  const data = await loadData('/data.json');
+  const data = await loadData('/dataset_final_simulateur.json');
   return { data };
 }
 
@@ -50,17 +50,39 @@ export default function Simulateur() {
 
     const userSurface = parseInt(surface);
 
-    // Fonction pour vérifier si la surface utilisateur est dans la plage
-    const isInRange = (surfaceRange: string, userSurface: number): boolean => {
-      const [min, max] = surfaceRange.split('-').map(Number);
-      return userSurface >= min && userSurface <= max;
+    // Fonction pour trouver la catégorie correspondante
+    const findCategorie = (surf: number): string => {
+      if (surf <= 10) return "0-10";
+      if (surf <= 20) return "10-20";
+      if (surf <= 30) return "20-30";
+      if (surf <= 40) return "30-40";
+      if (surf <= 50) return "40-50";
+      if (surf <= 60) return "50-60";
+      if (surf <= 70) return "60-70";
+      if (surf <= 80) return "70-80";
+      if (surf <= 90) return "80-90";
+      if (surf <= 100) return "90-100";
+      if (surf <= 110) return "100-110";
+      if (surf <= 120) return "110-120";
+      if (surf <= 130) return "120-130";
+      if (surf <= 140) return "130-140";
+      if (surf <= 150) return "140-150";
+      if (surf <= 160) return "150-160";
+      if (surf <= 170) return "160-170";
+      if (surf <= 180) return "170-180";
+      if (surf <= 190) return "180-190";
+      return "190-200";
     };
+
+    const categorie = findCategorie(userSurface);
+    const energieType = typeEnergie === 'electricite' ? 'ELEC' : 'GAZ';
 
     // Trouver des données similaires
     const similarData = data.filter(
       (d: RenovationData) =>
         d.Type_logement === typeLogement &&
-        isInRange(d.Surface, userSurface)
+        d.Categorie === categorie &&
+        d.Energie === energieType
     );
 
     if (similarData.length === 0) {
@@ -83,15 +105,13 @@ export default function Simulateur() {
       Economie_Elec_Chauffage: number;
       Economie_Elec_Global: number;
       Economie_Gaz_Estime_Iso: number;
-      Economie_Gaz_Estime_Chauffage: number;
-      Economie_Gaz_Estime_Global: number;
-      Dpe_Initial: string;
-      Dpe_Final_Iso: string;
-      Dpe_Final_Chauffage: string;
-      Dpe_Final_Global: string;
-      Conso_Base_Gaz: number;
-      Conso_Base_Elec: number;
-    }
+        Economie_Gaz_Estime_Chauffage: number;
+        Economie_Gaz_Estime_Global: number;
+        Dpe_Initial: string;
+        Dpe_Final_Iso: string;
+        Dpe_Final_Chauffage: string;
+        Dpe_Final_Global: string;
+      }
 
     const avgData = similarData.reduce(
       (acc: AvgDataType, curr: RenovationData) => ({
@@ -110,8 +130,6 @@ export default function Simulateur() {
         Economie_Gaz_Estime_Iso: acc.Economie_Gaz_Estime_Iso + curr.Economie_Gaz_Estime_Iso / similarData.length,
         Economie_Gaz_Estime_Chauffage: acc.Economie_Gaz_Estime_Chauffage + curr.Economie_Gaz_Estime_Chauffage / similarData.length,
         Economie_Gaz_Estime_Global: acc.Economie_Gaz_Estime_Global + curr.Economie_Gaz_Estime_Global / similarData.length,
-        Conso_Base_Gaz: acc.Conso_Base_Gaz + curr.Conso_Base_Gaz / similarData.length,
-        Conso_Base_Elec: acc.Conso_Base_Elec + curr.Conso_Base_Elec / similarData.length,
         Dpe_Initial: curr.Dpe_Initial,
         Dpe_Final_Iso: curr.Dpe_Final_Iso,
         Dpe_Final_Chauffage: curr.Dpe_Final_Chauffage,
@@ -133,16 +151,12 @@ export default function Simulateur() {
         Economie_Gaz_Estime_Iso: 0,
         Economie_Gaz_Estime_Chauffage: 0,
         Economie_Gaz_Estime_Global: 0,
-        Conso_Base_Gaz: 0,
-        Conso_Base_Elec: 0,
         Dpe_Initial: similarData[0].Dpe_Initial,
         Dpe_Final_Iso: similarData[0].Dpe_Final_Iso,
         Dpe_Final_Chauffage: similarData[0].Dpe_Final_Chauffage,
         Dpe_Final_Global: similarData[0].Dpe_Final_Global
       }
-    );
-
-    // Calculer les économies en fonction du type d'énergie
+    );    // Calculer les économies en fonction du type d'énergie
     const getEconomieAnnuelle = (elec: number, gaz: number) => {
       if (typeEnergie === 'electricite') return elec;
       return gaz; // gaz uniquement
@@ -180,12 +194,6 @@ export default function Simulateur() {
         economieGaz: Math.round(avgData.Economie_Gaz_Estime_Global)
       }
     ];
-
-    // Stocker les consommations de base
-    setBaseConsumption({
-      gaz: Math.round(avgData.Conso_Base_Gaz),
-      elec: Math.round(avgData.Conso_Base_Elec)
-    });
 
     setRecommendations(results);
     setShowResults(true);

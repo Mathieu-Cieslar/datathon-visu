@@ -1,6 +1,8 @@
 export interface RenovationData {
   Type_logement: string;
-  Surface: string; // Format: "min-max" (ex: "40-60")
+  Categorie: string; // Plage de surface (ex: "0-10", "10-20", "50-60")
+  Energie: string; // Type d'énergie: "ELEC" ou "GAZ"
+  Surface: number; // Surface moyenne de la catégorie (pour affichage uniquement)
   Prix_Reno_Chauffage: number;
   Prix_Reno_Iso: number;
   Prix_Reno_Global: number;
@@ -21,8 +23,7 @@ export interface RenovationData {
   Dpe_Final_Iso: string; // DPE après rénovation isolation uniquement
   Dpe_Final_Chauffage: string; // DPE après rénovation chauffage uniquement
   Dpe_Final_Global: string; // DPE après rénovation globale
-  Conso_Base_Gaz: number; // Consommation énergétique de base gaz (kWh/an)
-  Conso_Base_Elec: number; // Consommation énergétique de base électrique (kWh/an)
+  Nb_Logements: number; // Nombre de logements dans cette catégorie
 }
 
 export interface UserInput {

@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 
 export async function loader() {
-  const data = await loadData('/data.json');
+  const data = await loadData('/dataset_final_simulateur.json');
   const stats = calculateStats(data);
   return { data, stats };
 }

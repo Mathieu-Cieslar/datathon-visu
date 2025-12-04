@@ -7,7 +7,7 @@ import {
 } from 'recharts';
 
 export async function loader() {
-  const data = await loadData('/data.json');
+  const data = await loadData('/dataset_final_simulateur.json');
   const stats = calculateStats(data);
   return { data, stats };
 }
@@ -72,8 +72,8 @@ export default function Analytics() {
       avgSurfaceByType[d.Type_logement] = { count: 0, totalSurface: 0 };
     }
     avgSurfaceByType[d.Type_logement].count++;
-    // Calculer la surface moyenne de la plage "min-max"
-    const [min, max] = d.Surface.split('-').map(Number);
+    // Calculer la surface moyenne de la plage depuis Categorie (ex: "50-60" -> 55)
+    const [min, max] = d.Categorie.split('-').map(Number);
     const avgSurface = (min + max) / 2;
     avgSurfaceByType[d.Type_logement].totalSurface += avgSurface;
   });
