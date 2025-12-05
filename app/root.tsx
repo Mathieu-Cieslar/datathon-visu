@@ -54,7 +54,7 @@ export default function App() {
             <li><Link to="/">Accueil</Link></li>
             <li><Link to="/simulateur">Simulateur</Link></li>
             <li><Link to="/analytics">Analytics</Link></li>
-            <li><Link to="/dpe">DPE</Link></li>
+            
           </ul>
         </div>
       </nav>

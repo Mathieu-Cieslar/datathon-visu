@@ -484,10 +484,10 @@ export default function Simulateur() {
               <div className="chart-card">
                 <h3>📈 Évolution des économies cumulées (20 ans)</h3>
                 <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={cumulativeData}>
+                  <AreaChart data={cumulativeData} margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="année" label={{ value: 'Années', position: 'insideBottom', offset: -5 }} />
-                    <YAxis label={{ value: 'Économies (€)', angle: -90, position: 'insideLeft' }} />
+                    <YAxis label={{ value: 'Économies (€)', angle: -90, position: 'insideLeft' }} width={80} />
                     <Tooltip formatter={(value) => `${Number(value).toLocaleString('fr-FR')} €`} />
                     <Legend />
                     <Area type="monotone" dataKey="Isolation" stackId="1" stroke="#8884d8" fill="#8884d8" />
@@ -500,10 +500,10 @@ export default function Simulateur() {
               <div className="chart-card">
                 <h3>💰 Investissement vs Retour sur 10 et 20 ans</h3>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={investVsReturnData}>
+                  <BarChart data={investVsReturnData} margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
-                    <YAxis />
+                    <YAxis width={80} />
                     <Tooltip formatter={(value) => `${Number(value).toLocaleString('fr-FR')} €`} />
                     <Legend />
                     <Bar dataKey="Investissement" fill="#ff6b6b" />
@@ -516,10 +516,10 @@ export default function Simulateur() {
               <div className="chart-card">
                 <h3>📊 Réduction de consommation énergétique (%)</h3>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={reductionData} layout="vertical">
+                  <BarChart data={reductionData} layout="vertical" margin={{ left: 20, right: 20, top: 5, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" unit="%" />
-                    <YAxis dataKey="name" type="category" />
+                    <YAxis dataKey="name" type="category" width={100} />
                     <Tooltip formatter={(value) => `${value}%`} />
                     <Bar dataKey="Réduction (%)" fill="#82ca9d">
                       {reductionData.map((entry, index) => (

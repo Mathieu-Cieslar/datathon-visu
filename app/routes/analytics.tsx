@@ -131,10 +131,10 @@ export default function Analytics() {
         <h2>💰 Coût moyen de rénovation par type de logement</h2>
         <div className="chart-card">
           <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={avgCostByType}>
+            <BarChart data={avgCostByType} margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="type" />
-              <YAxis />
+              <YAxis width={80} />
               <Tooltip formatter={(value: number) => `${value.toLocaleString('fr-FR')} €`} />
               <Legend />
               <Bar dataKey="Isolation" fill="#8884d8" />
@@ -145,29 +145,15 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className="section">
-        <h2>📏 Surface moyenne par type de logement</h2>
-        <div className="chart-card">
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={surfaceStats}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="type" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="Surface moyenne (m²)" fill="#8dd1e1" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
 
       <div className="section">
         <h2>📈 Économies d'énergie en fonction de la surface</h2>
         <div className="chart-card">
           <ResponsiveContainer width="100%" height={400}>
-            <ScatterChart>
+            <ScatterChart margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" dataKey="surface" name="Surface" unit=" m²" />
-              <YAxis type="number" dataKey="economiesEuro" name="Économies" unit=" €/an" />
+              <YAxis type="number" dataKey="economiesEuro" name="Économies" unit=" €/an" width={80} />
               <Tooltip cursor={{ strokeDasharray: '3 3' }} />
               <Legend />
               <Scatter name="Économies annuelles" data={savingsBySurface} fill="#82ca9d" />
@@ -183,10 +169,10 @@ export default function Analytics() {
         <h2>⏱️ ROI moyen par type de rénovation</h2>
         <div className="chart-card">
           <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={roiData} layout="vertical">
+            <BarChart data={roiData} layout="vertical" margin={{ left: 20, right: 20, top: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" />
-              <YAxis dataKey="scenario" type="category" />
+              <YAxis dataKey="scenario" type="category" width={100} />
               <Tooltip />
               <Bar dataKey="Années amortissement" fill="#ff7c7c">
                 {roiData.map((entry, index) => (
@@ -201,14 +187,14 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className="section">
+      {/* <div className="section">
         <h2>💎 Corrélation : Investissement vs Économies</h2>
         <div className="chart-card">
           <ResponsiveContainer width="100%" height={400}>
-            <ScatterChart>
+            <ScatterChart margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" dataKey="investissement" name="Investissement" unit=" €" />
-              <YAxis type="number" dataKey="economieAnnuelle" name="Économie annuelle" unit=" €/an" />
+              <YAxis type="number" dataKey="economieAnnuelle" name="Économie annuelle" unit=" €/an" width={80} />
               <Tooltip cursor={{ strokeDasharray: '3 3' }} />
               <Legend />
               <Scatter name="Logements" data={investmentVsSavings} fill="#8884d8" />
@@ -218,16 +204,16 @@ export default function Analytics() {
             📊 Relation positive : Un investissement plus élevé génère généralement des économies annuelles plus importantes
           </p>
         </div>
-      </div>
+      </div> */}
 
       <div className="section">
         <h2>⚡ Répartition des économies d'énergie (kWh)</h2>
         <div className="chart-card">
           <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={energySavingsBreakdown}>
+            <BarChart data={energySavingsBreakdown} margin={{ left: 10, right: 20, top: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="scenario" />
-              <YAxis />
+              <YAxis width={80} />
               <Tooltip formatter={(value: number) => `${value.toLocaleString('fr-FR')} kWh`} />
               <Legend />
               <Bar dataKey="Électricité" stackId="a" fill="#ffd93d" />
